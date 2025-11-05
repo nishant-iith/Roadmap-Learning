@@ -34,7 +34,7 @@
 
 ### 7. Pointers and References
 
-#### a. <Part 1>
+#### a. Basic Memory Management
 - References
 - Memory Model
 - Lifetime of Objects
@@ -50,28 +50,28 @@
 
 ### 8. Structuring Codebase
 
-#### a. <Part 1>
+#### a. File Organization
 - Headers/cpp files
 - Forward Declaration
 
-#### b. <Part 2>
+#### b. Scope and Namespaces
 - Scope
 - Namespaces
 
 ### 9. Structures and Classes
 
-#### a. Object Oriented Programming
+#### a. Object Oriented Programming Basics
 
-#### b. <Part 2>
+#### b. Runtime Polymorphism
 - Dynamic Polymorphism
 - Virtual Methods
 - Virtual Tables
 
-#### c. <Part 3>
+#### c. Advanced Inheritance
 - Multiple Inheritance
 - Diamond Inheritance
 
-#### d. <Part 4>
+#### d. Resource Management
 - Rule of Zero, Five, Three
 
 ### 10. Exception Handling
@@ -105,12 +105,12 @@
 
 ### 13. Templates
 
-#### a. Template Specialization
+#### a. Template Fundamentals
 - Full template specialization
-- partial template specialization
+- Partial template specialization
 - Variadic Templates
 
-#### b. <Part 2>
+#### b. Advanced Template Techniques
 - Type Traits
 - SFINAE (Substitution Failure Is Not An Error)
 
