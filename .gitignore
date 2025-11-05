@@ -1,0 +1,19 @@
+# Claude-related files
+.claude/
+.claude-*
+claude-*
+
+# Raw content folder
+raw_content/
+raw-content/
+raw content/
+
+# Common ignore patterns
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+node_modules/
+.env
+.env.local
+.env.*.local
