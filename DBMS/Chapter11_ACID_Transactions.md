@@ -87,16 +87,47 @@
 
 ### Transaction Lifecycle Diagram
 
+**Complete Transaction State Flow**:
+
 ```mermaid
 stateDiagram-v2
     [*] --> Active : Transaction starts
-    Active --> Partially_Committed : All operations complete
-    Active --> Failed : Error occurs
-    Partially_Committed --> Committed : Changes made permanent
-    Partially_Committed --> Failed : Failure during commit
-    Failed --> Aborted : Rollback complete
-    Aborted --> [*] : Transaction terminated
-    Committed --> [*] : Transaction terminated
+    Active --> Partially_Committed : All operations complete successfully
+    Active --> Failed : Error occurs during execution
+
+    Partially_Committed --> Committed : Changes made permanent on DB
+    Partially_Committed --> Failed : Failure during commit operation
+
+    Failed --> Aborted : Rollback all changes
+    Aborted --> [*] : Transaction terminated (failed)
+
+    Committed --> [*] : Transaction terminated (success)
+```
+
+**Detailed State Transitions**:
+
+```mermaid
+flowchart TD
+    A[Start Transaction] --> B[Active State]
+    B --> C{Execution Result}
+    C -->|Success| D[Partially Committed]
+    C -->|Error| E[Failed State]
+
+    D --> F{Commit Operation}
+    F -->|Success| G[Committed State]
+    F -->|Failure| E
+
+    E --> H[Rollback Changes]
+    H --> I[Aborted State]
+
+    G --> J[Transaction Complete]
+    I --> J
+
+    style A fill:#e1f5fe
+    style G fill:#c8e6c9
+    style E fill:#ffcdd2
+    style I fill:#fff3e0
+    style J fill:#f3e5f5
 ```
 
 ### State Descriptions:
