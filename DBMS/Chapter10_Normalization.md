@@ -148,103 +148,128 @@ Imagine you have this table:
 
 ## Types of Normal Forms 📊
 
-Think of normal forms like **levels of cleanliness** for your room.
+Think of normal forms like **levels of cleanliness** - each level removes more mess.
 
 ### 1NF: First Normal Form 🧹
-**Requirements**:
-1. **Every relation cell must have atomic value**
-2. **Relation must not have multi-valued attributes**
+**Rule**: Every cell must have only ONE value
 
-**Before 1NF (Messy)**:
-```
-Student: 101
-Name: John
-Courses: [Math, Physics, Chemistry]  ❌ Multiple values
-```
+**Bad (Multi-valued)**:
+| Student_ID | Name    | Courses                    |
+|------------|---------|----------------------------|
+| 101        | John    | [Math, Physics, Chemistry]| ❌
 
-**After 1NF (Clean)**:
-```
-101 | John | Math
-101 | John | Physics
-101 | John | Chemistry ✅ One value per cell
-```
+**Good (Atomic values)**:
+| Student_ID | Name | Course    |
+|------------|------|-----------|
+| 101        | John | Math      |
+| 101        | John | Physics   |
+| 101        | John | Chemistry | ✅
+
+**Key Idea**: No lists or arrays in cells - each box has one item.
+
+---
 
 ### 2NF: Second Normal Form 🧹🧹
-**Requirements**:
-1. **Relation must be in 1NF**
-2. **There should not be any partial dependency**
-   - **All non-prime attributes must be fully dependent on PK**
-   - **Non-prime attribute cannot depend on the part of the PK**
+**Rules**:
+1. Must be in 1NF
+2. No **partial dependencies**
 
 **What is Partial Dependency?**
-When non-key data depends on only PART of the composite primary key.
+When data depends on only **part** of a composite key.
 
-**Example Problem**:
+**Problem Example**:
 ```
-Table: {Student_ID, Course_ID} → Student_Name, Grade, Course_Name
+Table: Enrollments
 Key: {Student_ID, Course_ID}
+Data: Student_Name, Grade, Course_Name
 
-Student_Name depends only on Student_ID (part of key) ❌ Partial Dependency
-Course_Name depends only on Course_ID (part of key) ❌ Partial Dependency
-Grade depends on both Student_ID and Course_ID ✅ Full Dependency
+❌ Student_Name depends only on Student_ID (partial!)
+❌ Course_Name depends only on Course_ID (partial!)
+✅ Grade depends on BOTH Student_ID AND Course_ID (full!)
 ```
 
-**Solution (2NF)**: Break into separate tables:
+**Solution**: Split into separate tables
 ```
-Students: {Student_ID} → Student_Name
-Courses: {Course_ID} → Course_Name
-Grades: {Student_ID, Course_ID} → Grade
+Students:   {Student_ID} → Student_Name
+Courses:    {Course_ID} → Course_Name
+Enrollments:{Student_ID, Course_ID} → Grade
 ```
+
+**Key Idea**: Non-key data must depend on the **entire** key, not just part of it.
+
+---
 
 ### 3NF: Third Normal Form 🧹🧹🧹
-**Requirements**:
-1. **Relation must be in 2NF**
-2. **No transitivity dependency exists**
-   - **Non-prime attribute should not determine a non-prime attribute**
+**Rules**:
+1. Must be in 2NF
+2. No **transitive dependencies**
 
 **What is Transitive Dependency?**
-A → B → C (where A is key, B and C are non-key)
+Chain reaction: Key → A → B (where A and B are non-key)
 
-**Example Problem**:
+**Problem Example**:
 ```
-Table: Student_ID → Student_Name, Dept_ID, Dept_Name
+Table: Students
 Key: Student_ID
+Data: Student_Name, Dept_ID, Dept_Name
 
-Student_ID → Dept_ID ✅ (Valid)
-Dept_ID → Dept_Name ❌ (Transitive Dependency - non-prime determining non-prime)
+✅ Student_ID → Dept_ID (OK - key to non-key)
+❌ Dept_ID → Dept_Name (BAD - non-key to non-key!)
 ```
 
-**Solution (3NF)**: Break it:
+**Solution**: Break the chain
 ```
-Students: {Student_ID} → Student_Name, Dept_ID
+Students:    {Student_ID} → Student_Name, Dept_ID
 Departments: {Dept_ID} → Dept_Name
 ```
 
-### 4. BCNF (Boyce-Codd Normal Form) 🏆
-**Requirements**:
-1. **Relation must be in 3NF**
-2. **For FD: A → B, A must be a super key**
-   - **We must not derive prime attribute from any prime or non-prime attribute**
+**Key Idea**: Non-key attributes shouldn't depend on other non-key attributes.
 
-**What does this mean?**
-If A → B, then A must be able to determine ALL attributes in the table
+---
 
-**Example Problem**:
+### BCNF: Boyce-Codd Normal Form 🏆
+**Rules**:
+1. Must be in 3NF
+2. **Every determinant must be a super key**
+
+**What this means**: If A → B, then A must be a **super key** (can determine ALL columns)
+
+**Problem Example**:
 ```
-Table: {Student, Course} → Professor
-Professor → Course
+Table: Class_Assignments
+Data: {Student, Course} → Professor
+      Professor → Course
 
 Key: {Student, Course}
 
-Professor → Course violates BCNF because:
-Professor is NOT a super key (doesn't determine Student)
+❌ Professor → Course violates BCNF
+   (Professor is NOT a super key - can't determine Student)
 ```
 
-**Solution (BCNF)**:
+**Solution**: Make determinants super keys
 ```
 Table1: {Student, Course} → Professor
-Table2: {Professor} → Course
+Table2: {Professor} → Course     (Professor is now super key here!)
 ```
+
+**Key Idea**: Anything that determines other data must be able to determine **everything** in the table.
+
+---
+
+## Quick Normal Form Test 🔍
+
+| Normal Form | Test Question | Fixes |
+|-------------|---------------|-------|
+| **1NF** | "Does any cell have multiple values?" | Repeating groups |
+| **2NF** | "Does any data depend on only part of the key?" | Partial dependencies |
+| **3NF** | "Does any non-key data depend on other non-key data?" | Transitive dependencies |
+| **BCNF** | "Is every determinant a super key?" | Remaining redundancy |
+
+**Memory Trick**:
+- **1NF** = One value per cell
+- **2NF** = No **P**artial dependencies
+- **3NF** = No **T**ransitive dependencies
+- **BCNF** = **B**etter than 3NF (every determinant is super key)
 
 ---
 
