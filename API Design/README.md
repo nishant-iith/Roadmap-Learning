@@ -87,7 +87,7 @@ Last-Modified: Wed, 21 Oct 2015 07:28:00 GMT
 - **Path Parameters**: `/users/{id}/posts/{post_id}`
 - **Content Negotiation**: `Accept: application/json` vs `Accept: application/xml`
 
-#### **Understand TCP/IP** 🌐
+#### **Understand TCP / IP** 🌐
 - **TCP**: Reliable, connection-oriented protocol
 - **IP**: Best-effort, connectionless protocol
 - **DNS**: Domain Name System for name resolution
@@ -345,7 +345,7 @@ Access based on relationships between entities
 Example: Owner can edit document, collaborators can view
 ```
 
-### **6. API Keys & Management** 🔑
+### **Section: API Keys & Management** 🔑
 
 #### **API Key Types**:
 - **Public Keys**: For client identification
@@ -360,7 +360,7 @@ Rotation: Regular key replacement policies
 Revocation: Immediate invalidation capability
 ```
 
-### **7. API Documentation Tools** 📚
+### **6. API Documentation Tools** 📚
 
 #### **Swagger / Open API** 📖
 ```yaml
@@ -398,7 +398,7 @@ paths:
 - Mock server
 - API documentation sharing
 
-### **8. API Security** 🔒
+### **7. API Security** 🔒
 
 #### **Best Practices**:
 - **HTTPS Only**: Encrypt all communications
@@ -417,7 +417,7 @@ paths:
 - **Data Exposure**: Minimize data in responses
 - **Rate Limiting Bypass**: Implement robust limiting
 
-### **9. API Performance** ⚡
+### **8. API Performance** ⚡
 
 #### **Performance Metrics** 📊
 ```
