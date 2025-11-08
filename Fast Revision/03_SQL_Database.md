@@ -70,79 +70,78 @@ graph TD
 
 ## Basic SQL Operations
 
-### 1. CREATE TABLE
-```sql
-CREATE TABLE employees (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    department VARCHAR(50),
-    salary DECIMAL(10, 2) CHECK (salary > 0),
-    hire_date DATE DEFAULT CURRENT_DATE
-);
-```
+### 1. CREATE TABLE Operations
+**Purpose**: Define table structure with columns, data types, and constraints
 
-### 2. INSERT (Create)
-```sql
--- Insert single record
-INSERT INTO employees (name, email, department, salary)
-VALUES ('John Doe', 'john@company.com', 'IT', 75000.00);
+**Key Components**:
+- **Column Definitions**: Name, data type, constraints
+- **Primary Key**: Unique identifier for each record
+- **Foreign Key**: Links to other tables
+- **Constraints**: Rules for data validation (NOT NULL, UNIQUE, CHECK)
+- **Default Values**: Automatic values when not specified
 
--- Insert multiple records
-INSERT INTO employees (name, email, department, salary) VALUES
-('Jane Smith', 'jane@company.com', 'HR', 65000.00),
-('Bob Johnson', 'bob@company.com', 'Finance', 80000.00);
-```
+**Interview Focus**: Understanding how to design proper table structures with appropriate data types and constraints.
 
-### 3. SELECT (Read)
-```sql
--- Select all columns
-SELECT * FROM employees;
+### 2. INSERT Operations
+**Purpose**: Add new records to tables
 
--- Select specific columns
-SELECT name, department, salary FROM employees;
+**Insertion Types**:
+- **Single Record**: Insert one row at a time
+- **Multiple Records**: Insert multiple rows in single statement
+- **Partial Data**: Insert only specified columns (others use defaults/NULL)
+- **Auto-increment**: Let database generate primary keys
 
--- Select with condition
-SELECT * FROM employees WHERE department = 'IT';
+**Key Considerations**:
+- Data must match column types
+- Constraints must be satisfied
+- Primary key uniqueness maintained
+- Foreign key references must exist
 
--- Select with multiple conditions
-SELECT * FROM employees
-WHERE department = 'IT' AND salary > 70000;
+### 3. SELECT Operations
+**Purpose**: Retrieve data from database
 
--- Select with range
-SELECT * FROM employees
-WHERE salary BETWEEN 60000 AND 80000;
+**Query Patterns**:
+- **Basic Selection**: Choose specific columns or all columns
+- **Conditional Filtering**: Use WHERE clause with conditions
+- **Multiple Conditions**: Combine with AND, OR operators
+- **Range Queries**: Use BETWEEN for numeric/date ranges
+- **List Queries**: Use IN for multiple possible values
+- **Pattern Matching**: Use LIKE for text patterns
 
--- Select with list
-SELECT * FROM employees
-WHERE department IN ('IT', 'HR', 'Finance');
+**Filtering Techniques**:
+- Comparison operators (=, <>, <, >, <=, >=)
+- Logical operators (AND, OR, NOT)
+- Wildcard patterns (%, _)
+- NULL value handling (IS NULL, IS NOT NULL)
 
--- Pattern matching
-SELECT * FROM employees
-WHERE name LIKE 'J%'; -- Names starting with 'J'
-```
+### 4. UPDATE Operations
+**Purpose**: Modify existing records
 
-### 4. UPDATE (Update)
-```sql
--- Update single record
-UPDATE employees
-SET salary = 80000
-WHERE id = 1;
+**Update Strategies**:
+- **Single Record**: Update specific row using primary key
+- **Bulk Updates**: Update multiple rows matching conditions
+- **Calculated Updates**: Update based on current values
+- **Conditional Updates**: Different updates based on conditions
 
--- Update multiple records
-UPDATE employees
-SET salary = salary * 1.10
-WHERE department = 'IT';
-```
+**Important Considerations**:
+- Always use WHERE clause to avoid updating entire table
+- Ensure foreign key constraints aren't violated
+- Consider transaction safety for critical updates
 
-### 5. DELETE (Delete)
-```sql
--- Delete specific record
-DELETE FROM employees WHERE id = 3;
+### 5. DELETE Operations
+**Purpose**: Remove records from tables
 
--- Delete with condition
-DELETE FROM employees WHERE department = 'Finance';
-```
+**Deletion Approaches**:
+- **Single Record**: Delete specific row using primary key
+- **Conditional Delete**: Remove rows matching criteria
+- **Cascade Delete**: Automatically delete related records
+- **Soft Delete**: Mark records as deleted instead of removing
+
+**Critical Points**:
+- Use WHERE clause to avoid deleting all data
+- Consider foreign key constraints
+- Back up important data before deletion
+- Understand cascade delete behavior
 
 ## Advanced SQL Queries
 
@@ -161,31 +160,44 @@ graph TD
     K["FULL OUTER JOIN"] --> L["All records from both"]
 ```
 
-#### INNER JOIN
-```sql
--- Employees and their departments
-SELECT e.name, d.department_name, d.location
-FROM employees e
-INNER JOIN departments d ON e.department_id = d.id;
-```
+#### INNER JOIN Concepts
+**Purpose**: Return only matching records from both tables
 
-#### LEFT JOIN
-```sql
--- All employees and their departments (even if no department assigned)
-SELECT e.name, d.department_name
-FROM employees e
-LEFT JOIN departments d ON e.department_id = d.id;
-```
+**Use Cases**:
+- Getting employees with their assigned departments
+- Finding customers with their orders
+- Linking students to their enrolled courses
 
-#### SELF JOIN
-```sql
--- Find employees and their managers
-SELECT
-    e1.name AS employee,
-    e2.name AS manager
-FROM employees e1
-LEFT JOIN employees e2 ON e1.manager_id = e2.id;
-```
+**Key Points**:
+- Only rows with matching keys in both tables are included
+- Most commonly used join type
+- Perfect for finding relationships that definitely exist
+
+#### LEFT JOIN Concepts
+**Purpose**: Return all records from left table, matching from right table
+
+**Use Cases**:
+- All employees and their departments (including unassigned)
+- Customers and their orders (including customers without orders)
+- Students and their grades (including students without grades)
+
+**Key Points**:
+- All records from left table are included
+- NULL values for right table when no match exists
+- Useful for finding missing relationships
+
+#### SELF JOIN Concepts
+**Purpose**: Join a table to itself for hierarchical relationships
+
+**Use Cases**:
+- Employees and their managers (same table)
+- Categories and parent categories
+- Comments and reply relationships
+
+**Key Points**:
+- Same table used with different aliases
+- Requires foreign key referencing same table
+- Essential for organizational structures
 
 ### 2. Aggregate Functions
 ```mermaid
@@ -200,51 +212,41 @@ graph TD
     D --> I["MIN()"]
 ```
 
-#### Basic Aggregates
-```sql
--- Count total employees
-SELECT COUNT(*) FROM employees;
+#### Basic Aggregates Concepts
+**COUNT Function**: Counts number of rows in a group
+- **Use Cases**: Total records, records per category, validation counts
+- **Interview Focus**: Understanding COUNT(*) vs COUNT(column) vs COUNT(DISTINCT column)
 
--- Count employees by department
-SELECT department, COUNT(*) as employee_count
-FROM employees
-GROUP BY department;
+**SUM Function**: Calculates total of numeric values
+- **Use Cases**: Total sales, salary budgets, inventory quantities
+- **Key Point**: Works only on numeric data types
 
--- Average salary by department
-SELECT
-    department,
-    AVG(salary) as avg_salary,
-    MAX(salary) as max_salary,
-    MIN(salary) as min_salary
-FROM employees
-GROUP BY department;
+**AVG Function**: Calculates average value
+- **Use Cases**: Average salary, average order value, average rating
+- **Important**: Ignores NULL values in calculations
 
--- Total salary budget by department
-SELECT
-    department,
-    SUM(salary) as total_salary_budget
-FROM employees
-GROUP BY department;
-```
+**MAX/MIN Functions**: Find highest/lowest values
+- **Use Cases**: Highest salary, earliest date, maximum price
+- **Performance**: Can use indexes effectively on indexed columns
 
-#### GROUP BY with HAVING
-```sql
--- Departments with more than 5 employees
-SELECT
-    department,
-    COUNT(*) as employee_count
-FROM employees
-GROUP BY department
-HAVING COUNT(*) > 5;
+#### GROUP BY with HAVING Concepts
+**GROUP BY Purpose**: Group rows with same values into summary rows
 
--- Departments with average salary > 70000
-SELECT
-    department,
-    AVG(salary) as avg_salary
-FROM employees
-GROUP BY department
-HAVING AVG(salary) > 70000;
-```
+**Common Grouping Patterns**:
+- **Categorization**: Group by department, category, status
+- **Time Analysis**: Group by date, month, year
+- **Geographic**: Group by country, state, city
+
+**HAVING vs WHERE**:
+- **WHERE**: Filters rows before grouping
+- **HAVING**: Filters groups after aggregation
+- **Order**: WHERE → GROUP BY → HAVING
+
+**Real-world Examples**:
+- Departments with more than 5 employees
+- Product categories with average price above threshold
+- Months with total sales exceeding targets
+- Customers with order count above average
 
 ### 3. Subqueries
 ```mermaid
@@ -258,47 +260,52 @@ graph TD
 ```
 
 #### Subquery in WHERE Clause
-```sql
--- Employees earning above average salary
-SELECT name, salary
-FROM employees
-WHERE salary > (SELECT AVG(salary) FROM employees);
+**Purpose**: Filter results based on values from another query
 
--- Employees in IT department
-SELECT * FROM employees
-WHERE department_id = (
-    SELECT id FROM departments
-    WHERE name = 'IT'
-);
-```
+**Common Patterns**:
+- **Comparison with Aggregate**: Compare values against group statistics
+- **Membership Testing**: Check if values exist in another table
+- **Range Queries**: Use results of one query to filter another
+
+**Real-world Examples**:
+- Employees earning above company average salary
+- Products priced above category average
+- Customers who placed orders in last month
+- Students scoring above class average
+
+**Interview Focus**: Understanding subquery execution order and performance implications.
 
 #### Subquery in FROM Clause
-```sql
--- Find department with highest average salary
-SELECT department_name, avg_salary
-FROM (
-    SELECT
-        d.name as department_name,
-        AVG(e.salary) as avg_salary,
-        ROW_NUMBER() OVER (ORDER BY AVG(e.salary) DESC) as rank
-    FROM employees e
-    JOIN departments d ON e.department_id = d.id
-    GROUP BY d.name
-) ranked
-WHERE rank = 1;
-```
+**Purpose**: Use query results as a temporary table for further analysis
+
+**Use Cases**:
+- **Derived Tables**: Create temporary result sets for complex queries
+- **Ranking Operations**: Find top/bottom performers within groups
+- **Complex Aggregations**: Multi-level grouping and calculations
+
+**Real-world Examples**:
+- Department with highest average salary
+- Top 3 customers by purchase amount
+- Most profitable product categories
+- Students with highest GPA in each major
+
+**Key Point**: FROM clause subqueries must have aliases and are called derived tables.
 
 #### Correlated Subquery
-```sql
--- Employees earning more than department average
-SELECT name, department, salary
-FROM employees e1
-WHERE salary > (
-    SELECT AVG(salary)
-    FROM employees e2
-    WHERE e2.department = e1.department
-);
-```
+**Purpose**: Subquery that depends on values from outer query
+
+**Characteristics**:
+- **Row-by-Row Execution**: Runs once for each row of outer query
+- **Reference Outer Query**: Can access columns from outer query
+- **Performance Consideration**: Can be slower than non-correlated
+
+**Real-world Examples**:
+- Employees earning more than their department average
+- Customers with above-average order values
+- Products performing better than category average
+- Students scoring above their major's GPA average
+
+**Interview Focus**: Understanding when to use correlated vs non-correlated subqueries.
 
 ### 4. Window Functions
 ```mermaid
@@ -312,29 +319,42 @@ graph TD
     D --> G["LEAD, LAG, FIRST_VALUE"]
 ```
 
-#### Ranking Functions
-```sql
--- Rank employees by salary within department
-SELECT
-    name,
-    department,
-    salary,
-    RANK() OVER (PARTITION BY department ORDER BY salary DESC) as rank_in_dept,
-    DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) as dense_rank,
-    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) as row_num
-FROM employees;
-```
+#### Ranking Functions Concepts
+**RANK()**: Assigns rank with gaps for ties
+- **Use Case**: Competition rankings, sales performance
+- **Behavior**: 1, 2, 2, 4 (tie causes skip)
 
-#### Aggregate Window Functions
-```sql
--- Running total of salaries
-SELECT
-    name,
-    salary,
-    SUM(salary) OVER (ORDER BY salary) as running_total,
-    AVG(salary) OVER (ORDER BY salary ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING) as moving_avg
-FROM employees;
-```
+**DENSE_RANK()**: Assigns rank without gaps
+- **Use Case**: Academic grades, continuous rankings
+- **Behavior**: 1, 2, 2, 3 (no skipping)
+
+**ROW_NUMBER()**: Assigns unique sequential numbers
+- **Use Case**: Pagination, unique ordering
+- **Behavior**: 1, 2, 3, 4 (no ties)
+
+**PARTITION BY**: Creates groups for ranking within
+- **Real-world**: Rank employees within each department
+- **Benefit**: Multiple independent rankings in one query
+
+#### Aggregate Window Functions Concepts
+**Window Frame**: Defines the set of rows for calculation
+
+**Common Window Patterns**:
+- **Running Total**: Cumulative sum over ordered rows
+- **Moving Average**: Average of sliding window of rows
+- **Year-over-Year**: Compare with previous year's data
+
+**Frame Specifications**:
+- **ROWS BETWEEN**: Physical row boundaries
+- **RANGE BETWEEN**: Logical value boundaries
+- **UNBOUNDED PRECEDING**: From start to current row
+- **N PRECEDING/FOLLOWING**: N rows before/after current
+
+**Business Applications**:
+- Running sales totals throughout the year
+- 7-day moving average of stock prices
+- Cumulative customer acquisition
+- Quarterly performance comparisons
 
 ## Database Design
 
@@ -406,116 +426,130 @@ graph TD
     A --> D["Method 3: Window Function"]
 ```
 
-#### Solution 1: LIMIT and OFFSET
-```sql
-SELECT DISTINCT salary
-FROM employees
-ORDER BY salary DESC
-LIMIT 1 OFFSET 2; -- 3rd highest (0-indexed)
-```
+#### Solution Approaches
 
-#### Solution 2: Subquery
-```sql
-SELECT MAX(salary)
-FROM employees
-WHERE salary < (
-    SELECT MAX(salary)
-    FROM employees
-    WHERE salary < (
-        SELECT MAX(salary) FROM employees
-    )
-);
-```
+**Method 1: LIMIT and OFFSET**
+- **Concept**: Sort salaries descending, skip N-1 rows, take next
+- **Advantage**: Simple and intuitive
+- **Limitation**: Database-specific syntax (LIMIT vs TOP vs ROWNUM)
 
-#### Solution 3: Window Function
-```sql
-SELECT DISTINCT salary
-FROM (
-    SELECT
-        salary,
-        DENSE_RANK() OVER (ORDER BY salary DESC) as rank
-    FROM employees
-) ranked
-WHERE rank = 3;
-```
+**Method 2: Nested Subqueries**
+- **Concept**: Find highest salary less than previous highest
+- **Advantage**: Works across all databases
+- **Interview Value**: Shows understanding of subquery logic
+
+**Method 3: Window Functions**
+- **Concept**: Use DENSE_RANK() to assign ranks, filter by rank
+- **Advantage**: Efficient, handles ties gracefully
+- **Modern Approach**: Preferred in recent database versions
+
+**Key Interview Points**:
+- Understanding of duplicates handling
+- Performance implications of each method
+- Database compatibility considerations
+- Edge cases (less than N distinct salaries)
 
 ### 2. Find Duplicate Records
-```sql
--- Find duplicate emails
-SELECT email, COUNT(*) as count
-FROM employees
-GROUP BY email
-HAVING COUNT(*) > 1;
 
--- Find complete duplicate rows
-SELECT name, email, department, COUNT(*) as count
-FROM employees
-GROUP BY name, email, department
-HAVING COUNT(*) > 1;
+#### Problem Approaches
 
--- Show all duplicate records
-SELECT * FROM employees
-WHERE (name, email, department) IN (
-    SELECT name, email, department
-    FROM employees
-    GROUP BY name, email, department
-    HAVING COUNT(*) > 1
-);
-```
+**Finding Duplicates by Specific Column**
+- **Concept**: Group by suspected duplicate column, count occurrences
+- **Use Case**: Find duplicate email addresses, phone numbers
+- **Implementation**: GROUP BY + HAVING COUNT(*) > 1
+
+**Finding Complete Row Duplicates**
+- **Concept**: Group by all columns to find identical rows
+- **Use Case**: Data cleaning, identifying data entry errors
+- **Challenge**: Need to consider all columns for complete duplication
+
+**Showing All Duplicate Records**
+- **Concept**: Display complete records that are duplicates
+- **Two-Step Process**: First find duplicates, then show full records
+- **Performance Consideration**: Can be expensive on large tables
+
+**Business Scenarios**:
+- Customer data deduplication
+- Removing duplicate orders
+- Cleaning survey responses
+- Identifying system-generated duplicate entries
+
+**Interview Focus**: Understanding GROUP BY, HAVING, and subquery relationships.
 
 ### 3. Department with Most Employees
-```sql
--- Method 1: JOIN and ORDER BY
-SELECT
-    d.name,
-    COUNT(e.id) as employee_count
-FROM departments d
-LEFT JOIN employees e ON d.id = e.department_id
-GROUP BY d.id, d.name
-ORDER BY employee_count DESC
-LIMIT 1;
 
--- Method 2: Subquery
-SELECT name
-FROM departments
-WHERE id = (
-    SELECT department_id
-    FROM employees
-    GROUP BY department_id
-    ORDER BY COUNT(*) DESC
-    LIMIT 1
-);
-```
+#### Solution Approaches
+
+**Method 1: JOIN with ORDER BY and LIMIT**
+- **Concept**: Join tables, group by department, sort by count, take top
+- **Advantage**: Intuitive and easy to understand
+- **Consideration**: Handles ties based on database's LIMIT behavior
+
+**Method 2: Subquery Approach**
+- **Concept**: Find department with max employees in subquery
+- **Advantage**: Clear separation of logic
+- **Interview Value**: Shows understanding of nested queries
+
+**Handling Ties**: Different approaches for handling multiple departments with same max count
+- **Method Limitation**: LIMIT may return only one of tied departments
+- **Complete Solution**: Use window functions to handle ties properly
+
+**Real-world Applications**:
+- Finding top-performing branches
+- Identifying busiest departments
+- Resource allocation decisions
+- Performance analysis
 
 ### 4. Pivot Table (Rows to Columns)
-```sql
--- Transform student marks from rows to columns
-SELECT
-    student_name,
-    SUM(CASE WHEN subject = 'Math' THEN marks ELSE 0 END) AS Math,
-    SUM(CASE WHEN subject = 'Science' THEN marks ELSE 0 END) AS Science,
-    SUM(CASE WHEN subject = 'English' THEN marks ELSE 0 END) AS English
-FROM student_marks
-GROUP BY student_name;
-```
+
+#### Pivoting Concepts
+
+**Purpose**: Transform row-based data into columnar format for reporting
+
+**Implementation Strategy**: Use conditional aggregation with CASE statements
+- **Logic**: For each desired column, sum values when condition matches
+- **Flexibility**: Can handle varying numbers of categories
+- **Performance**: Generally efficient with proper indexing
+
+**Real-world Examples**:
+- Student marks by subject (rows to columns)
+- Sales data by month/quarter
+- Survey responses by question
+- Financial statements by period
+
+**Challenges**:
+- **Dynamic Columns**: Need to know possible values in advance
+- **NULL Handling**: Decide how to handle missing values
+- **Performance**: Can be slow with many pivoted columns
+
+**Modern Alternatives**: Some databases have built-in PIVOT functions
 
 ### 5. Find Employees Who Never Took Leave
-```sql
--- Employees with no leave records
-SELECT e.name, e.department
-FROM employees e
-LEFT JOIN leave_requests l ON e.id = l.employee_id
-WHERE l.employee_id IS NULL;
 
--- Alternative using NOT EXISTS
-SELECT name, department
-FROM employees e
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM leave_requests l
-    WHERE l.employee_id = e.id
-);
-```
+#### Problem Patterns
+
+**LEFT JOIN with NULL Check**
+- **Concept**: Left join and check for NULL in joined table
+- **Logic**: Employees without matching leave records
+- **Advantage**: Standard SQL pattern, widely supported
+
+**NOT EXISTS Approach**
+- **Concept**: Check for non-existence of related records
+- **Logic**: For each employee, verify no leave records exist
+- **Performance**: Often more efficient than LEFT JOIN
+
+**NOT IN Alternative**
+- **Concept**: Find employees not in the set of employees who took leave
+- **Caveat**: Must handle NULL values carefully
+- **Performance**: Can be slower on large datasets
+
+**Business Applications**:
+- Identifying employees who never used benefits
+- Finding customers who never made purchases
+- Detecting unused resources
+- Compliance reporting
+
+**Interview Focus**: Understanding different anti-join patterns and their performance characteristics.
 
 ## Performance Optimization
 
@@ -532,22 +566,25 @@ graph TD
 ```
 
 #### When to Use Indexes
-- Columns in WHERE clause
-- Columns in JOIN conditions
-- Columns in ORDER BY
-- Columns with high cardinality (many unique values)
 
-#### Creating Indexes
-```sql
--- Single column index
-CREATE INDEX idx_employee_name ON employees(name);
+**High-Value Index Candidates**:
+- **WHERE Clause Columns**: Frequently filtered columns
+- **JOIN Columns**: Foreign keys and join conditions
+- **ORDER BY Columns**: Sorted result sets
+- **High Cardinality Columns**: Many unique values (user IDs, timestamps)
 
--- Composite index (multiple columns)
-CREATE INDEX idx_dept_salary ON employees(department, salary);
+**Index Types and Their Use Cases**:
+- **Single Column Index**: Most common, single field lookups
+- **Composite Index**: Multiple columns searched together
+- **Unique Index**: Enforces uniqueness and speeds up lookups
+- **Partial Index**: Index subset of rows with conditions
 
--- Unique index
-CREATE UNIQUE INDEX idx_employee_email ON employees(email);
-```
+**Trade-offs**:
+- **Storage Overhead**: Indexes consume disk space
+- **Write Performance**: Slower INSERT/UPDATE/DELETE operations
+- **Maintenance**: Indexes need to be updated with data changes
+
+**Interview Focus**: Understanding when indexes help vs hurt performance, and how to choose optimal index columns.
 
 ### Query Optimization Tips
 ```mermaid
@@ -565,14 +602,31 @@ graph TD
 4. **Optimize JOIN order** - small tables first
 5. **Use EXISTS instead of IN** for subqueries
 
-### EXPLAIN Plan
-```sql
--- Analyze query execution
-EXPLAIN SELECT * FROM employees WHERE department = 'IT';
+### Query Performance Analysis
 
--- Detailed execution plan
-EXPLAIN ANALYZE SELECT * FROM employees WHERE department = 'IT';
-```
+#### EXPLAIN Plan Concepts
+**Purpose**: Understand how database executes your query
+
+**Key Information Revealed**:
+- **Join Order**: Sequence of table operations
+- **Index Usage**: Whether indexes are being used
+- **Scan Types**: Full table scan vs index scan
+- **Cost Estimates**: Database's predicted execution cost
+- **Row Estimates**: Expected number of rows processed
+
+**Performance Indicators**:
+- **Sequential Scans**: May indicate missing indexes
+- **High Cost Numbers**: Potential optimization opportunities
+- **Nested Loops**: May suggest better join strategies
+- **Hash Joins**: Generally efficient for large datasets
+
+**Interpretation Strategy**:
+1. Identify most expensive operations
+2. Check for unexpected full table scans
+3. Verify index usage in WHERE and JOIN clauses
+4. Look for opportunities to add or modify indexes
+
+**Interview Value**: Demonstrates understanding of database internals and performance tuning methodology.
 
 ## Transactions and ACID
 
@@ -591,47 +645,82 @@ graph TD
 ```
 
 #### Transaction Examples
-```sql
--- Bank transfer transaction
-BEGIN TRANSACTION;
 
--- Deduct from account A
-UPDATE accounts SET balance = balance - 1000
-WHERE id = 1;
+**Bank Transfer Scenario**:
+- **Atomicity Requirement**: Both debit and credit must succeed or fail together
+- **Consistency Check**: Total money in system remains constant
+- **Isolation Need**: Concurrent transfers don't interfere with each other
+- **Durability Guarantee**: Once committed, transfers survive system crashes
 
--- Add to account B
-UPDATE accounts SET balance = balance + 1000
-WHERE id = 2;
+**E-commerce Order Processing**:
+1. Check inventory availability
+2. Reserve items for customer
+3. Process payment
+4. Update inventory levels
+5. Confirm order
 
--- Commit if both successful
-COMMIT; -- or ROLLBACK if error
-```
+**Transaction Commands**:
+- **BEGIN/START TRANSACTION**: Initiate transaction
+- **COMMIT**: Make changes permanent
+- **ROLLBACK**: Undo all changes in transaction
+- **SAVEPOINT**: Create rollback points within transaction
+
+**Interview Focus**: Understanding why transactions are essential for data integrity and how ACID properties protect against common problems like lost updates and dirty reads.
 
 ## Database Security
 
 ### SQL Injection Prevention
-```sql
--- Vulnerable (Never do this!)
-String query = "SELECT * FROM users WHERE username = '" + username + "'";
 
--- Safe (Use parameterized queries)
-PreparedStatement stmt = conn.prepareStatement(
-    "SELECT * FROM users WHERE username = ?"
-);
-stmt.setString(1, username);
-```
+#### Understanding SQL Injection
+
+**Attack Concept**: Malicious SQL code inserted through input fields
+
+**Classic Example**:
+- **Input**: `' OR '1'='1' --`
+- **Result**: Bypasses authentication, returns all users
+- **Impact**: Unauthorized data access, data modification, data deletion
+
+**Prevention Strategies**:
+
+**1. Parameterized Queries**
+- **Principle**: Separate SQL logic from data values
+- **Implementation**: Use prepared statements with parameter markers
+- **Benefit**: Database handles proper escaping automatically
+- **Example**: Query structure defined first, values bound later
+
+**2. Input Validation**
+- **Whitelist Approach**: Allow only expected characters/values
+- **Type Checking**: Validate data types match expectations
+- **Length Limits**: Restrict input field lengths
+- **Special Character Handling**: Remove or escape dangerous characters
+
+**3. ORM Frameworks**
+- **Abstraction Layer**: Object-Relational Mapping handles SQL generation
+- **Built-in Protection**: Most frameworks include injection prevention
+- **Type Safety**: Compile-time type checking prevents issues
 
 ### Access Control
-```sql
--- Grant read-only access
-GRANT SELECT ON employees TO 'readonly_user';
 
--- Grant full access
-GRANT ALL PRIVILEGES ON employees TO 'admin_user';
+#### Database Security Principles
 
--- Revoke access
-REVOKE INSERT ON employees FROM 'limited_user';
-```
+**Principle of Least Privilege**:
+- **Grant Minimum**: Users get only necessary permissions
+- **Role-based Access**: Group users by function, assign roles
+- **Regular Audits**: Review and adjust permissions periodically
+
+**Common Permission Types**:
+- **SELECT**: Read-only access to data
+- **INSERT/UPDATE/DELETE**: Data modification permissions
+- **CREATE/ALTER/DROP**: Structure modification permissions
+- **ALL PRIVILEGES**: Full administrative access
+
+**Security Best Practices**:
+- **Application Users**: Separate from administrative users
+- **Database-Specific Users**: Different credentials per application
+- **Connection Security**: Use SSL/TLS for connections
+- **Audit Logging**: Track all database access and modifications
+
+**Interview Focus**: Understanding common security vulnerabilities and implementing defense-in-depth strategies for database protection.
 
 ## Quick Reference
 

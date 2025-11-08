@@ -1,16 +1,19 @@
 # Chapter 2: System Design Fundamentals
 
-## System Design Basics for Freshers
+## System Design Basics
 
 ### What is System Design?
-- **Definition**: Process of defining architecture, components, and relationships of a system
+- **Definition**: Process of defining architecture, components, and interfaces of a system to meet specific requirements
 - **Purpose**: Create scalable, maintainable, and efficient systems
-- **Fresher Focus**: Low-Level Design (LLD) rather than High-Level Design (HLD)
+- **Importance**: Foundation for building applications that can handle growth and complexity
+- **Interview Focus**: Understanding trade-offs, scalability, and architectural decisions
 
 ### Key System Design Concepts
 
 #### 1. Scalability
-**Definition**: System's ability to handle growth in users, data, and requests
+**Definition**: System's ability to handle increasing amounts of work by adding resources
+- **Horizontal Scaling**: Adding more machines to handle increased load
+- **Vertical Scaling**: Adding more power (CPU, RAM) to existing machines
 
 ```mermaid
 graph TD
@@ -23,40 +26,23 @@ graph TD
     E --> F
 ```
 
-**Types of Scaling**:
-- **Vertical Scaling**: Add more resources to single server
-  - Pros: Simple to implement
-  - Cons: Limited by hardware capacity
-- **Horizontal Scaling**: Add more servers
-  - Pros: Unlimited growth, better fault tolerance
-  - Cons: Complex coordination, higher costs
+**When to use each**:
+- **Horizontal**: For web applications, microservices, when you need unlimited growth
+- **Vertical**: For databases, monolithic applications, when you need consistent performance
 
 #### 2. Load Balancing
-**Purpose**: Distribute incoming requests across multiple servers
-
-```mermaid
-graph TD
-    A["Users"] --> B["Load Balancer"]
-    B --> C["Server A"]
-    B --> D["Server B"]
-    B --> E["Server C"]
-
-    F["Load Balancing Algorithms"] --> G["Round Robin"]
-    F --> H["Least Connections"]
-    F --> I["IP Hash"]
-```
-
-**Common Algorithms**:
-- **Round Robin**: Requests distributed evenly
-- **Least Connections**: Send to least busy server
-- **IP Hash**: Same user always goes to same server
+**Purpose**: Distribute incoming network traffic across multiple servers
+- **Benefits**: No single point of failure, better resource utilization, improved availability
+- **Types**: Hardware load balancers, software load balancers, DNS load balancing
 
 #### 3. Caching
-**Purpose**: Store frequently accessed data to improve performance
+**Purpose**: Store frequently accessed data in faster storage to reduce response time
+- **Levels**: Browser cache, CDN cache, application cache, database cache
+- **Types**: In-memory cache (Redis, Memcached), distributed cache
 
 ```mermaid
 graph TD
-    A["User Request"] --> B["Cache"]
+    A["User Request"] --> B["Cache Check"]
     B --> C{"Cache Hit?"}
     C -->|Yes| D["Return Cached Data"]
     C -->|No| E["Fetch from Database"]
@@ -64,49 +50,42 @@ graph TD
     F --> G["Return Data"]
 ```
 
-**Cache Types**:
-- **Client-Side**: Browser cache, CDN
-- **Server-Side**: Redis, Memcached
-- **Database**: Query caching
-
 #### 4. Database Design Choices
-```mermaid
-graph TD
-    A["Application Needs"] --> B{"Structured Data?"}
-    B -->|Yes| C["SQL Database"]
-    B -->|No| D["NoSQL Database"]
+- **SQL (Relational)**: Structured data, ACID properties, joins and relationships
+- **NoSQL (Non-relational)**: Unstructured data, horizontal scaling, flexibility
 
-    C --> E["MySQL, PostgreSQL"]
-    D --> F["MongoDB, Cassandra"]
+| Aspect | SQL | NoSQL |
+|-------|-----|-------|
+| **Data Model** | Structured, tables | Unstructured, documents |
+| **Consistency** | Strong consistency | Eventual consistency |
+| **Scaling** | Vertical scaling | Horizontal scaling |
+| **Query Language** | SQL | Various (document queries, etc.) |
+| **Use Cases** | Financial, transactions | Social media, big data |
 
-    G["ACID Required?"] -->|Yes| C
-    G -->|No| D
-```
+### High-Level Architecture Patterns
 
-| Database Type | When to Use | Examples |
-|-------------|-------------|---------|
-| **SQL** | Structured data, relationships, transactions | Banking, e-commerce |
-| **NoSQL** | Unstructured data, high scalability | Social media, IoT |
-
-## Basic Architecture Patterns
-
-### 1. Monolithic Architecture
-**Definition**: Single, unified application with all functionality
+#### 1. Monolithic Architecture
+**Definition**: Single, unified application where all functionality is contained within one deployable unit
 
 ```mermaid
 graph TD
-    A["Web Layer"] --> B["Business Logic"]
-    B --> C["Database Layer"]
-    B --> D["Auth Module"]
-    B --> E["Payment Module"]
-    B --> F["Notification Module"]
+    A["Monolithic Application"] --> B["User Interface"]
+    A --> C["Business Logic"]
+    A --> D["Data Access"]
+    A --> E["Database"]
+
+    F["Characteristics"] --> G["Simple to develop"]
+    F --> H["Easy deployment"]
+    F --> I["Limited scalability"]
+    F --> J["Tight coupling"]
 ```
 
-**Pros**: Simple to develop, test, and deploy
-**Cons**: Difficult to scale, technology limitations
+**Pros and Cons**:
+- **Pros**: Simple architecture, easier debugging, single deployment unit
+- **Cons**: Scalability limitations, technology lock-in, deployment risks
 
-### 2. Microservices Architecture
-**Definition**: Collection of loosely coupled, independently deployable services
+#### 2. Microservices Architecture
+**Definition**: Application structured as collection of loosely coupled services
 
 ```mermaid
 graph TD
@@ -118,13 +97,20 @@ graph TD
     B --> F["User Database"]
     C --> G["Order Database"]
     D --> H["Product Database"]
+    E --> I["Payment Database"]
+
+    J["Characteristics"] --> K["Independent deployment"]
+    J --> L["Technology flexibility"]
+    J --> M["Complex communication"]
+    J --> N["Operational complexity"]
 ```
 
-**Pros**: Independent scaling, technology flexibility
-**Cons**: Complex coordination, network latency
+**Pros and Cons**:
+- **Pros**: Independent scaling, technology flexibility, team autonomy
+- **Cons**: Network complexity, distributed transactions, operational overhead
 
-### 3. Client-Server Architecture
-**Definition**: Clients request services, servers provide them
+#### 3. Client-Server Architecture
+**Definition**: Distributed application structure where clients request services from servers
 
 ```mermaid
 graph TD
@@ -132,345 +118,352 @@ graph TD
     B --> C["Server"]
     C --> D["Database"]
     C --> E["File Storage"]
-    C --> F["External Services"]
+
+    F["Components"] --> G["Presentation Layer (Client)"]
+    F --> H["Business Logic (Server)"]
+    F --> I["Data Layer (Database)"]
 ```
 
-**Components**:
-- **Client**: User interface, application logic
-- **Server**: Business logic, data processing
-- **Database**: Data storage and retrieval
-
-## Common Fresher System Design Questions
+## Common System Design Problems for Freshers
 
 ### 1. Design a URL Shortener
 
-#### Requirements
-- Convert long URLs to short URLs
-- Redirect short URLs to original URLs
-- Handle high traffic efficiently
-- Track click statistics
-
-#### System Components
+#### Requirements Analysis
 ```mermaid
 graph TD
-    A["User"] --> B["URL Shortener Service"]
-    B --> C["Hash Function"]
-    B --> D["Database"]
-    B --> E["Cache (Redis)"]
+    A["URL Shortener Requirements"] --> B["Generate Short URLs"]
+    A --> C["Redirect Short URLs"]
+    A --> D["Handle High Traffic"]
+    A --> E["Track Analytics"]
 
-    F["Short URL Request"] --> G["Database Lookup"]
-    G --> H["Redirect to Long URL"]
-
-    I["Analytics"] --> J["Click Tracking"]
-    I --> K["Statistics Dashboard"]
+    B --> F["Unique Codes"]
+    B --> G["Collision Handling"]
+    C --> H["Fast Lookup"]
+    D --> I["Load Distribution"]
+    E --> J["Click Statistics"]
 ```
 
-#### Key Design Decisions
+#### Core Components
+**Key Components**:
+- **URL Shortening Service**: Generates unique short codes from long URLs
+- **Database**: Stores mapping between short and long URLs
+- **Redirect Service**: Handles redirection from short to long URLs
+- **Analytics Service**: Tracks clicks and generates statistics
 
-**URL Generation**:
-- **Base 62 Encoding**: Uses 0-9, a-z, A-Z (62 characters)
-- **Hash Function**: Converts long URL to unique short code
-- **Collision Handling**: Regenerate if code already exists
+#### Design Considerations
+- **Short Code Generation**: Use Base62 encoding (0-9, a-z, A-Z) for maximum combinations
+- **Collision Handling**: Implement strategies to handle duplicate short codes
+- **Redirection Speed**: Use in-memory database or caching for fast lookups
+- **Scalability**: Handle millions of URLs and concurrent requests
 
-```mermaid
-graph TD
-    A["Long URL Input"] --> B["Generate Hash"]
-    B --> C{"Collision?"}
-    C -->|Yes| D["Regenerate Hash"]
-    C -->|No| E["Store Mapping"]
-    D --> B
-```
-
-**Database Schema**:
-```sql
-CREATE TABLE url_mappings (
-    short_code VARCHAR(10) PRIMARY KEY,
-    long_url TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    click_count INT DEFAULT 0
-);
-
-CREATE TABLE analytics (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    short_code VARCHAR(10),
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (short_code) REFERENCES url_mappings(short_code)
-);
-```
-
-**API Design**:
-```mermaid
-graph TD
-    A["POST /shorten"] --> B["Request Body: long_url"]
-    A --> C["Response: short_url"]
-
-    D["GET /:shortCode"] --> E["Redirect: 301 Moved Permanently"]
-
-    F["GET /analytics/:shortCode"] --> G["Response: click_count, analytics"]
-```
+#### Hash Function Design
+- **Input**: Long URL string
+- **Output**: Short alphanumeric code (6-8 characters)
+- **Considerations**: Uniform distribution, collision resistance, uniqueness
 
 ### 2. Design a Parking Lot System
 
-#### Requirements
-- Multiple vehicle types (Car, Motorcycle, Truck)
-- Different parking spot sizes
-- Entry/exit management
-- Payment calculation
-
-#### System Architecture
+#### Requirements Analysis
 ```mermaid
 graph TD
-    A["Entrance Gate"] --> B["Parking Lot System"]
-    C["Exit Gate"] --> B
+    A["Parking Lot System"] --> B["Multiple Vehicle Types"]
+    A --> C["Spot Management"]
+    A --> D["Entry/Exit Gates"]
+    A --> E["Payment Processing"]
 
-    B --> D["Spot Management"]
-    B --> E["Vehicle Management"]
-    B --> F["Payment System"]
-
-    D --> G["Compact Spots"]
-    D --> H["Large Spots"]
-    D --> I["Motorcycle Spots"]
-
-    E --> J["Vehicle Entry"]
-    E --> K["Vehicle Exit"]
-    E --> L["Spot Assignment"]
+    B --> F["Cars, Motorcycles, Trucks"]
+    C --> G["Spot Availability"]
+    C --> H["Different Spot Sizes"]
+    D --> I["Ticket Generation"]
+    D --> J["Fee Calculation"]
 ```
 
-#### Key Components
+#### Core Components
+**Key Entities**:
+- **ParkingLot**: Main system that manages all parking operations
+- **Vehicle**: Abstract base class representing different vehicle types
+- **ParkingSpot**: Represents individual parking spots with size and availability
+- **Ticket**: Contains parking information, time, and payment details
+- **Entry/Exit Gates**: Manage vehicle entry and exit processes
 
-**Vehicle Types and Spot Matching**:
+#### Design Considerations
+- **Vehicle-Spot Matching**: Determine which vehicle types can use which spot types
+- **Concurrency Handling**: Multiple vehicles entering/exiting simultaneously
+- **Time-based Pricing**: Different rates for different time periods
+- **Real-time Availability**: Update spot availability as vehicles enter/exit
+
+#### Spot Allocation Strategy
+- **Motorcycle**: Can park in motorcycle, compact, or large spots
+- **Car**: Can park in compact or large spots
+- **Truck**: Can only park in large spots
+- **Priority**: Nearest available spot of appropriate size
+
+### 3. Design a Library Management System
+
+#### Requirements Analysis
 ```mermaid
 graph TD
-    A["Vehicle"] --> B["Vehicle Type"]
-    B --> C{"Required Spot Size"}
+    A["Library System"] --> B["Book Management"]
+    A --> C["Member Management"]
+    A --> D["Issue/Return Process"]
+    A --> E["Search Functionality"]
 
-    C -->|Motorcycle| D["Motorcycle/Compact Spot"]
-    C -->|Car| E["Compact/Large Spot"]
-    C -->|Truck| F["Large Spot Only"]
+    B --> F["Add/Remove Books"]
+    B --> G["Update Book Information"]
+    B --> H["Track Availability"]
+
+    C --> I["Register Members"]
+    C --> J["Update Member Details"]
+    C --> K["Membership Tiers"]
+
+    D --> L["Book Issuing"]
+    D --> M["Book Returning"]
+    D --> N["Due Date Management"]
+
+    E --> O["Title Search"]
+    E --> P["Author Search"]
+    E --> Q["ISBN Search"]
 ```
 
-**Entry/Exit Flow**:
+#### Core Components
+**Key Entities**:
+- **Library**: Main system orchestrator
+- **Book**: Represents books with metadata and availability status
+- **Member**: Library members with borrowing privileges and limits
+- **Librarian**: System administrator with extended privileges
+- **IssueRecord**: Tracks book borrowing history and fine calculation
+
+#### Design Considerations
+- **Search Functionality**: Multiple search criteria (title, author, genre, ISBN)
+- **Reservation System**: Handle book reservations when books are not available
+- **Fine Calculation**: Calculate late return fines based on duration and book type
+- **Concurrent Operations**: Handle multiple users borrowing/returning books simultaneously
+
+### 4. Design a Chat Application
+
+#### Requirements Analysis
 ```mermaid
 graph TD
-    A["Vehicle Arrives"] --> B["Generate Ticket"]
-    B --> C["Find Available Spot"]
-    C --> D{"Spot Found?"}
-    D -->|Yes| E["Assign Spot"]
-    D -->|No| F["Reject Entry"]
-    E --> G["Record Entry Time"]
-    G --> H["Raise Gate"]
+    A["Chat Application"] --> B["Real-time Messaging"]
+    A --> C["User Management"]
+    A --> D["Group Chats"]
+    A --> E["Message History"]
+    A --> F["Online Status"]
 
-    I["Vehicle Exits"] --> J["Scan Ticket"]
-    J --> K["Calculate Duration"]
-    K --> L["Calculate Payment"]
-    L --> M["Process Payment"]
-    M --> N["Update Spot Status"]
+    B --> G["Text Messages"]
+    B --> H["File Sharing"]
+    B --> I["Media Sharing"]
+
+    C --> J["User Registration"]
+    C --> K["Authentication"]
+    C --> L["User Profiles"]
+
+    D --> M["Group Creation"]
+    D --> N["Member Management"]
+    D --> O["Group Permissions"]
 ```
 
-**Core Classes** (Interview Focus):
-- `Vehicle`: License plate, type, entry time
-- `ParkingSpot`: Spot ID, type, availability
-- `ParkingLot`: Collection of spots, assignment logic
-- `Ticket`: Vehicle info, spot assignment, entry/exit times
+#### Core Components
+**Key Entities**:
+- **ChatServer**: Central server handling all chat operations
+- **User**: Represents chat users with profiles and status
+- **Message**: Represents chat messages with content and metadata
+- **ChatRoom**: Represents group chats with multiple participants
+- **ConnectionManager**: Handles real-time connections between users
 
-### 3. Design a Chat Application
-
-#### Requirements
-- Real-time messaging
-- Multiple chat rooms
-- User online/offline status
-- Message history
-
-#### System Architecture
-```mermaid
-graph TD
-    A["Client 1"] --> B["WebSocket Server"]
-    C["Client 2"] --> B
-    D["Client 3"] --> B
-
-    B --> E["Message Queue"]
-    E --> F["Database"]
-    E --> G["Notification Service"]
-
-    H["Web App"] --> I["Load Balancer"]
-    I --> J["Multiple WebSocket Servers"]
-```
-
-#### Key Design Components
-
-**Real-time Communication**:
-- **WebSocket**: Bidirectional communication
-- **Message Queue**: Handle high message volume
-- **Database**: Store message history
-- **Load Balancer**: Distribute connections
-
-**Message Flow**:
-```mermaid
-graph TD
-    A["User Sends Message"] --> B["WebSocket Server"]
-    B --> C["Message Queue"]
-    C --> D["Database Storage"]
-    C --> E["Recipients"]
-    E --> F["WebSocket Servers"]
-    F --> G["Receive Message"]
-```
-
-**Room Management**:
-- Users can create/join rooms
-- Messages delivered to room participants
-- Online status tracking per room
-
-### 4. Design a Library Management System
-
-#### Requirements
-- Book catalog management
-- Member registration
-- Book issue/return
-- Fine calculation
-
-#### System Components
-```mermaid
-graph TD
-    A["Librarian"] --> B["Library System"]
-    C["Member"] --> B
-
-    B --> D["Book Management"]
-    B --> E["Member Management"]
-    B --> F["Issue Management"]
-
-    D --> G["Add/Remove Books"]
-    D --> H["Search Books"]
-    D --> I["Track Availability"]
-
-    F --> J["Issue Books"]
-    F --> K["Return Books"]
-    F --> L["Calculate Fines"]
-```
-
-#### Key Entities
-```mermaid
-erDiagram
-    BOOK ||--o{ BOOK_ISSUE : issued_to
-    MEMBER ||--o{ BOOK_ISSUE : issues
-    BOOK {
-        string isbn PK
-        string title
-        string author
-        bool is_available
-        int total_copies
-        int available_copies
-    }
-    MEMBER {
-        string member_id PK
-        string name
-        string email
-        string phone
-        int max_books_allowed
-    }
-    BOOK_ISSUE {
-        string issue_id PK
-        string isbn FK
-        string member_id FK
-        date issue_date
-        date due_date
-        date return_date
-        decimal fine_amount
-    }
-```
+#### Design Considerations
+- **Real-time Communication**: Use WebSocket or long polling for instant messaging
+- **Message Persistence**: Store chat history for future retrieval
+- **Online Status**: Track and display user availability
+- **Scalability**: Handle thousands of concurrent users and messages
 
 ## Design Principles for Interviews
 
-### 1. Single Responsibility Principle
-**Definition**: Each class should have one reason to change
+### SOLID Principles
 
-**Example**: Separate user authentication from user profile management
+1. **Single Responsibility Principle**: Each class should have one reason to change
+2. **Open/Closed Principle**: Open for extension, closed for modification
+3. **Liskov Substitution Principle**: Subtypes must be substitutable for their base types
+4. **Interface Segregation Principle**: Clients should not depend on interfaces they don't use
+5. **Dependency Inversion Principle**: Depend on abstractions, not concretions
 
-### 2. Open/Closed Principle
-**Definition**: Open for extension, closed for modification
+### Common Design Patterns
 
-**Example**: Use interfaces/abstract classes instead of modifying existing code
+#### Creational Patterns
+- **Singleton**: Ensures only one instance of class exists
+- **Factory**: Creates objects without specifying exact class
+- **Builder**: Constructs complex objects step by step
 
-### 3. Dependency Inversion
-**Definition**: Depend on abstractions, not concretions
+#### Structural Patterns
+- **Adapter**: Allows incompatible interfaces to work together
+- **Decorator**: Adds functionality to objects dynamically
+- **Proxy**: Controls access to another object
 
-**Example**: Program to interfaces, not implementations
+#### Behavioral Patterns
+- **Observer**: One-to-many dependency between objects
+- **Strategy**: Encapsulates algorithms and makes them interchangeable
+- **Command**: Encapsulates request as an object
 
-## Interview Approach for System Design
+## Scalability and Performance
 
-### Step-by-Step Method
+### Horizontal vs Vertical Scaling
+```mermaid
+graph TD
+    A["Scaling Strategies"] --> B["Horizontal Scaling"]
+    A --> C["Vertical Scaling"]
 
-#### 1. Clarify Requirements
-- Ask about functional requirements
-- Understand scale (users, requests per second)
-- Identify constraints (budget, timeline, technology)
+    B --> D["Add More Machines"]
+    B --> E["Distribute Load"]
+    B --> F["Unlimited Growth"]
 
-#### 2. High-Level Design
-- Identify major components
-- Define data flow between components
-- Choose appropriate architecture pattern
+    C --> G["More Power"]
+    C --> H["Single Machine"]
+    C --> I["Limited Growth"]
+```
 
-#### 3. Deep Dive
-- Design each component in detail
-- Consider data structures
-- Handle edge cases
+### Caching Strategies
+- **Cache-Aside**: Application manages cache and database
+- **Write-Through**: Write to both cache and database simultaneously
+- **Write-Behind**: Write to cache first, then update database later
+- **Refresh-Ahead**: Preload cache before data expires
 
-#### 4. Discuss Trade-offs
-- Performance vs Complexity
-- Consistency vs Availability (CAP theorem)
-- Cost vs Scalability
+### Database Optimization
+- **Indexing**: Create indexes on frequently queried columns
+- **Partitioning**: Split large tables into smaller, manageable pieces
+- **Replication**: Create read replicas to distribute read operations
+- **Connection Pooling**: Reuse database connections to reduce overhead
 
-### Common Interview Questions
+## Security Considerations
 
-#### Basic Questions
-- "What is the difference between SQL and NoSQL databases?"
-- "Why would you use caching?"
-- "What is a load balancer and why is it important?"
+### Authentication and Authorization
+- **Authentication**: Verify user identity (who are you?)
+- **Authorization**: Grant appropriate permissions (what can you do?)
+- **Implementation**: JWT tokens, OAuth 2.0, session management
 
-#### Intermediate Questions
-- "How would you handle database failover?"
-- "What are the pros and cons of microservices?"
-- "How would you design for 1 million concurrent users?"
+### Data Protection
+- **Encryption**: Encrypt sensitive data at rest and in transit
+- **Access Control**: Implement proper access control mechanisms
+- **Data Validation**: Validate all input data to prevent injection attacks
+- **Regular Audits**: Monitor and audit access to sensitive data
 
-#### Advanced Questions
-- "How would you implement real-time features?"
-- "What are the security considerations?"
-- "How would you monitor system health?"
+### Common Security Threats
+- **SQL Injection**: Malicious SQL code in input fields
+- **XSS (Cross-Site Scripting)**: Malicious scripts in web pages
+- **CSRF (Cross-Site Request Forgery)**: Unauthorized actions on behalf of user
+- **DDoS (Distributed Denial of Service)**: Overwhelm system with traffic
+
+## Monitoring and Observability
+
+### Monitoring Metrics
+- **Performance Metrics**: Response time, throughput, error rates
+- **Business Metrics**: User engagement, transaction success rate
+- **Infrastructure Metrics**: CPU, memory, disk usage, network traffic
+- **Application Metrics**: Application-specific KPIs
+
+### Alerting Strategy
+- **Threshold-based**: Alert when metrics exceed predefined thresholds
+- **Anomaly Detection**: Alert when unusual patterns are detected
+- **Multi-level Alerts**: Different alert levels for different severity
+- **Escalation Rules**: Escalate alerts when not acknowledged
+
+## Common Interview Questions
+
+### Basic Questions
+
+**Q1: What is the difference between horizontal and vertical scaling?**
+**Answer**:
+- **Horizontal scaling**: Add more machines to handle increased load
+- **Vertical scaling**: Add more power (CPU, RAM) to existing machines
+- **Trade-offs**: Horizontal offers unlimited growth but adds complexity, vertical is simpler but limited
+
+**Q2: When would you use NoSQL vs SQL databases?**
+**Answer**:
+- **SQL**: Structured data, ACID compliance, complex queries (financial systems, e-commerce)
+- **NoSQL**: Unstructured data, horizontal scaling, flexibility (social media, big data)
+
+**Q3: What is a load balancer and why is it important?**
+**Answer**: Load balancer distributes incoming traffic across multiple servers to ensure no single server is overwhelmed. Important for availability, scalability, and reliability.
+
+### Intermediate Questions
+
+**Q4: How would you design a system that handles 1 million concurrent users?**
+**Answer**:
+- Use load balancer to distribute traffic across multiple servers
+- Implement caching at multiple levels (CDN, application, database)
+- Use auto-scaling to handle variable load
+- Design stateless services for easy horizontal scaling
+- Implement proper monitoring and alerting
+
+**Q5: What are the trade-offs between monolithic and microservices architecture?**
+**Answer**:
+- **Monolithic**: Simpler to develop and deploy initially, but scaling challenges later
+- **Microservices**: More complex initially, but better scalability and team autonomy
+- **Decision depends on**: Team size, system complexity, scalability requirements
+
+### Advanced Questions
+
+**Q6: How would you design a system that needs to be highly available?**
+**Answer**:
+- Use multi-region deployment with data replication
+- Implement automatic failover mechanisms
+- Use load balancing with health checks
+- Implement circuit breakers to prevent cascading failures
+- Regular backup and disaster recovery procedures
+
+**Q7: How would you handle database scaling for a high-traffic application?**
+**Answer**:
+- Read replicas to distribute read operations
+- Database sharding to distribute data across multiple databases
+- Connection pooling to manage database connections efficiently
+- Caching layer to reduce database load
+- Use appropriate indexing and query optimization
+
+## Design Process for Interviews
+
+### Step-by-Step Approach
+1. **Clarify Requirements**: Ask questions to understand system scope and constraints
+2. **Estimate Scale**: Understand expected load and storage requirements
+3. **High-Level Design**: Identify major components and their relationships
+4. **Deep Dive**: Detail each component's design and data structures
+5. **Bottleneck Analysis**: Identify potential performance bottlenecks
+6. **Scalability**: Discuss how system will handle growth
+
+### Common Interview Techniques
+- **Start Simple**: Begin with basic design and add complexity gradually
+- **Ask Questions**: Clarify ambiguities and constraints
+- **Explain Trade-offs**: Discuss pros and cons of design decisions
+- **Consider Edge Cases**: Think about error handling and boundary conditions
+- **Draw Diagrams**: Use diagrams to communicate design effectively
 
 ## Quick Reference
 
-### Key Concepts Summary
-| Concept | Definition | Interview Focus |
+### Key Design Concepts
+| Concept | Description | Interview Focus |
 |---------|-------------|-----------------|
-| **Scalability** | Handle growth | Vertical vs Horizontal scaling |
-| **Load Balancing** | Distribute traffic | Algorithms and benefits |
-| **Caching** | Store frequently accessed data | Cache strategies |
-| **Database Design** | Data storage and retrieval | SQL vs NoSQL choices |
+| **Scalability** | Handle increasing load | Horizontal vs vertical |
+| **Availability** | System uptime and reliability | Redundancy, failover |
+| **Performance** | Response time and throughput | Caching, optimization |
+| **Consistency** | Data consistency guarantees | Strong vs eventual |
+| **Security** | Protection against threats | Authentication, encryption |
 
-### Architecture Patterns
-| Pattern | When to Use | Key Characteristics |
-|---------|-------------|-------------------|
-| **Monolithic** | Simple applications, small teams | Single codebase, easier deployment |
-| **Microservices** | Large scale, independent teams | Service independence, scalability |
-| **Client-Server** | Distributed systems | Clear separation of concerns |
+### Common Patterns
+| Pattern | Use Case | Interview Focus |
+|---------|----------|-----------------|
+| **Load Balancer** | Distribute traffic | High availability |
+| **Caching** | Improve performance | Cache strategies |
+| **Message Queue** | Asynchronous communication | Decoupling |
+| **Database Replication** | Scale read operations | Read replicas |
+| **CDN** | Content delivery | Geographic distribution |
 
-### Interview Tips
-
-1. **Start with requirements clarification**
-2. **Draw diagrams** to communicate design
-3. **Explain trade-offs** (pros/cons)
-4. **Consider edge cases** and error handling
-5. **Think about scalability** from the beginning
-
-### Common Mistakes to Avoid
-
-1. **Jumping to code** without understanding requirements
-2. **Ignoring scalability** and performance concerns
-3. **Not considering** different failure scenarios
-4. **Over-engineering** simple solutions
-5. **Forgetting to discuss** trade-offs and alternatives
+### System Design Checklist
+| Aspect | Consideration | Key Questions |
+|--------|-------------|-------------|
+| **Requirements** | Functional and non-functional | What is expected scale? |
+| **Scalability** | Growth handling | How does it scale? |
+| **Availability** | Uptime requirements | How to handle failures? |
+| **Performance** | Response time requirements | What are latency requirements? |
+| **Security** | Protection mechanisms | How to secure the system? |
 
 ---
 
-**Important Note**: System design interviews focus on your thought process and problem-solving approach. Practice explaining your design decisions clearly and considering multiple perspectives. Always ask clarifying questions before starting the design.
+**Important Note**: In system design interviews, interviewers are more interested in your thought process, understanding of trade-offs, and ability to justify design decisions than in perfect technical details. Focus on understanding the problem clearly, identifying key requirements, and making reasonable design choices.
